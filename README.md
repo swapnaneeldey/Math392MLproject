@@ -1,107 +1,18 @@
-# Predicting Democratic or Republican Votes Given a Various Demographic of People 
-A project that predicts whether a county is likely to vote Democratic or Republican using real voting data across four presidential electiomn years from a variety of factors using a dataset provided from our Professor.
+# Predicting U.S. Presidential Elections Using Neural Networks
 
-## Stakeholders
-**Campaign Strategies**: Detecting counties that would be more likely to lean Democratic based on the demographic factors.
-**Political Analyst**: Identifying demographic traits that could link to voting patterns
+In this project, we set out to explore a question that blends political science and machine learning: Can we predict the outcome of the U.S. 
+presidential elections using only demographic and socioeconomic data? More than just testing model accuracy, we wanted to understand why certain predictions were made and what that tells us about the electorate.
 
-## Key Performance Indicators (KPI)
-**Accuracy** of classification if Democratic win vs not
-**Confusion Matrix**
-**Model generalizability** across each election year
-**Interpretability** of model features and their influence on prediction
+For this project, we worked with data provided by our professor, covering four election years: 2008, 2012, 2016, and 2020. The dataset included probability distributions of party outcomes for each county, alongside an extensive range of features including education levels, age distributions, household income brackets, racial demographics, and more. These inputs gave us a robust portrait of each county, and our goal was to use this data to classify which party, either Democratic or Republican, was most likely to win in a given region. But we were just as interested in why a model would reach a particular conclusion.
 
-## The Dataset
-This data is across 4 U.S presidential election dates; the year 2008, 2012, 2016, and finally 2020.
-The specific type of dataset we are using to predict Democratic or Republican votes consist of over 100 features expressed as conditional probabilities, meaning each feature is in the form of `P(attribute|C)`:
-- **Age and Education**: e.g., `P(male_25_34_bachelors|C)` — probability that someone in the county is a 25–34-year-old male with a bachelor's degree
-- **Gender breakdown**: `P(persons_male|C)`, `P(persons_female|C)`
-- **Marital status**: `P(female_divorced|C)`, `P(male_never_married|C)`
-- **Race and ethnicity**: `P(persons_white|C)`, `P(persons_black|C)`, `P(persons_hispanic|C)`
-- **Income distribution**: `P(households_income_25k_50k|C)`, `P(households_income_under_10k|C)`
-- **Poverty and employment**: `P(persons_below_poverty|C)`, `P(labor_force_employed|C)`
-- **Veteran and immigration status**: `P(civilians_veteran|C)`, `P(persons_foreign_born|C)`
-And many more conditional demographic features.
-In addition, the dataset includes **vote share probabilities** for the three major voting categories:
+We decided to split the data chronologically, we trained the model on data from 2008, when the Democratic party won, and 2016, when the Republican party won, to ensure the model was exposed to instances of both major parties securing victory. This approach aimed to reduce potential bias and help the model generalize better across different political outcomes. We validated it on 2012, and using 2020 as our final test. We beleived this split would better replicate how machine learning is actually deployed: using the past to anticipate the future.
 
-- `P(democrat|C)` – probability that a county voted Democrat
-- `P(republican|C)` – probability that a county voted Republican
-- `P(other|C)` – probability that a county voted for other parties
+The model was implemented in PyTorch, where we focused on proper scaling and class balancing to prevent the network from simply memorizing dominant voting patterns. During training and evaluation, we used confusion matrices to visualize prediction performance and generated detailed classification reports to assess precision and recall across each class.
 
-These probabilities are not used as features for model training. Instead, they are used to compute the target variable:
+One of our key visual outputs was the confusion matrix from the 2020 test results. It made the strengths and weaknesses of the model immediately clear: Democratic strongholds, especially dense urban counties, were correctly classified with high confidence. Similarly, many rural counties with older populations and lower education levels, which historically lean Republican, were predicted accurately.
 
- `target_democrat_win` = 1 if `P(democrat|C)` is the highest among the three parties, else 0
+The most revealing plots were the ones that highlighted the gray areas, or the misclassifications. Suburban counties, places in demographic flux, and historically unpredictable regions were far more difficult for the model to handle. It was in these mistakes that we found some truths where politics isn’t static, and voters don’t always behave in ways that are easily captured by a formula.
 
-This binary target is what the model is trained to predict using the **demographic features** only.
+What we learned through this process is that neural networks are powerful tools for pattern recognition, but their predictions are bound to the data we feed them. They can mirror past trends but are not built to anticipate social change or political upsets unless we account for those possibilities in the model structure or features.
 
-
-## Modeling Approach
-For our model, we used a Neural Network (NN), which is a popular model that is used for handling datasets with many features like ours.
-Here is the breakdown of our Approach to model the data:
-### Data Feature Selection
-
-To begin, we needed to prepare the dataset:
-
-- **Removed non-numeric columns** which include identifiers like `county` or `state`, and vote outcome columns like `democrat`, `republican`, and `other`.
-- **Removed redundant columns**: We also removed the derived target columns and election `year` to help avoid leaking information which can effect our final results.
-- Final dataset included over 100 numeric features.
-
-### Define the Target Variable
-
-- As mentioned earlier, we created `target_democrat_win`, a binary column:
-  - 1 for a Democratic win
-  - 0 for anything else
-
-### Train-Test Split
-
-To evaluate the model fairly, we split the data as so:
-
-- **Training set (50%)**: Used to train the model. Years 2008, 2012
-- **Validation Set (25%)**: Used to help fine tune the model for better testing results. Year 2016.
-- **Test set (25%)**: Used to evaluate how well the model performs on new data. Year 2020.
-
-### Feature Scaling
-
-Neural networks work best when all input features are on a similar scale. We used a technique called **standardization**, which rescales all numeric columns to have:
-
-- Mean of 0
-- Standard deviation of 1
-
-This is done using `StandardScaler()` from the `sklearn` library.
-
-### Building the Neural Network Model
-
-We used the **PyTorch** library in order to help model:
-
-- **Input Layer**: One neuron for each feature (around 100)
-- **Hidden Layers**:
-  - Dense layer with 64 units and ReLU activation
-  - Dropout layer (to prevent overfitting)
-  - Dense layer with 32 units and ReLU
-- **Output Layer**:
-  - Single neuron with to predict probability of Democrat win (1) or not (0)
-
-### Compile and Train the Model
-
-- **Loss function**: Binary Crossentropy Loss (for binary classification)
-- **Optimizer**
-- **Epochs**: Multiple passes over the data
-
-We trained the model over multiple **epochs** to validated it against the test set.
-
-### Evaluate the Model
-
-- **Accuracy**
-- **Classification report** (precision)
-- **Confusion matrix**: Visual insight into what the model got right vs wrong
-
-
-## Results
-The model achieved strong overall accuracy in predicting county level outcomes.
-- **High precision** for solid-blue counties
-The model also identified important demographic correlations including:
-  - Higher education levels == Democratic lean
-  - Rural or lower income == Republican lean
-
-## Concluding Analysis
-This project shows how demographic probabilities can offer meaningful insight into electoral behavior. While not perfect, the model demonstrates that machine learning can discover political trends rooted in census-like data
+This project reinforced how essential preprocessing and validation designs are to become meaningful outcomes. But more than that, it reminded us that data science isn’t just about predictions but it’s about questions and what we ask. Even with the mistakes our models can make, they become opportunities to better understand what we might want to know.

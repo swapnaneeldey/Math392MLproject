@@ -17,25 +17,34 @@ In many political forecasting tools, polling and sentiment analysis dominate the
 This project is our attempt to answer that question, using machine learning that include these features.
 
 
-## Models Trained
+## Models Used
 
-We trained and compared the following four models:
+We trained and compared the following four models in our project:
 
-1. **Logistic Regression**
-   - A straightforward baseline model used for binary classification.
-   - Provided interpretable coefficients but limited in handling complex, nonlinear patterns.
+1. **Three-Layer Neural Network**
+   - A fully connected multilayer perceptron (MLP) built using PyTorch.
+   - Consists of three layers: input to 128 neurons, then to 64 neurons, and finally to a single output neuron.
+   - Uses ReLU activations between layers and applies dropout regularization of 30% to help prevent overfitting.
+   - Outputs a single probability score after applying a sigmoid activation at the final layer.
 
-2. **Multilayer Perceptron (MLP)**
-   - A classic fully connected neural network built using PyTorch.
-   - Included multiple hidden layers with ReLU activation and dropout regularization.
+2. **Two-Layer Neural Network**
+   - A simpler fully connected neural network, also built using PyTorch.
+   - Consists of two layers: input to 64 neurons and then directly to the output neuron.
+   - Includes a ReLU activation and dropout of 30% after the first layer before producing a final sigmoid output.
+   - Provides a lightweight alternative to the 3-layer network for faster training and fewer parameters.
 
-3. **PyTorch Neural Network (Custom MLP)**
-   - Custom designed with flexibility in architecture and training control.
-   - Enabled precise tuning and checkpoint saving for best model performance.
+3. **Logistic Regression (PyTorch Implementation)**
+   - A basic logistic regression model implemented using a single fully connected layer followed by a sigmoid activation.
+   - Serves as a fundamental linear classifier for binary classification tasks.
+   - Offers interpretable weights but is limited to modeling linear decision boundaries.
 
-4. **TensorFlow Dense Neural Network**
-   - Implemented with Keras for accessibility and comparison.
-   - Similar architecture to the PyTorch model, used to validate consistency across frameworks.
+4. **Linear Regression Model (PyTorch Implementation)**
+   - A simple linear model that maps the input features directly to a single output without a final sigmoid activation initially.
+   - Trained using binary cross-entropy loss, treating the output as probabilities.
+
+**Note:**  
+- All models were trained using a common PyTorch NeuralNetworkTrainer class that included early stopping, batch processing, and validation monitoring.  
+- Training histories (loss curves) and confusion matrices were plotted for all models for side-by-side comparison.
 
 Each of these models followed a train, validation, and test set. To ensure balanced training and reduce partisan bias, we chose to train our models using data from the 2008 and 2016 presidential elections, years in which each major political party won once. We beleived this allowed the model to learn from a more diverse set of electoral outcomes and avoid overfitting to a single party's victory pattern.
 
@@ -47,13 +56,14 @@ This then led us to use the 2020 election year data on our test, which we seem t
 
 ## Best Performing Model
 
-The PyTorch MLP model emerged as the most effective, demonstrating the best generalization performance. Its architecture allowed it to model non linear relationships in the data more effectively than logistic regression, and it offered more control and flexibility than the TensorFlow implementation.
+The Three Layer Neural Network was the best performing model across all evaluation metrics.
 
-It consistently achieved:
-- Over 80% accuracy
-- Balanced precision and recall across both classes (Democratic and Republican)
-- Strong performance even in closely contested counties
+Its deeper architecture, with two hidden layers (128 and 64 neurons), allowed it to better capture the complex, nonlinear relationships in the county level election data compared to simpler models like logistic regression or a basic two layer network. The inclusion of dropout regularization helped it generalize well without overfitting.
 
+The 3 Layer MLP consistently achieved:
+- Validation accuracies exceeding 80%.
+- Balanced F1-scores for both Democratic and Republican classes.
+- Strong predictive performance even for closely contested swing counties.
 
 ## Visualizations and Interpretation
 

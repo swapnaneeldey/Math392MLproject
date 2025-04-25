@@ -1,18 +1,107 @@
-# Predicting U.S. Presidential Elections Using Neural Networks
+# ElectionPredictor
 
-In this project, we set out to explore a question that blends political science and machine learning: Can we predict the outcome of the U.S. 
-presidential elections using only demographic and socioeconomic data? More than just testing model accuracy, we wanted to understand why certain predictions were made and what that tells us about the electorate.
+## Can we predict the U.S. presidential vote at the county level using only demographic and socioeconomic data?
 
-For this project, we worked with data provided by our professor, covering four election years: 2008, 2012, 2016, and 2020. The dataset included probability distributions of party outcomes for each county, alongside an extensive range of features including education levels, age distributions, household income brackets, racial demographics, and more. These inputs gave us a robust portrait of each county, and our goal was to use this data to classify which party, either Democratic or Republican, was most likely to win in a given region. But we were just as interested in why a model would reach a particular conclusion.
 
-We decided to split the data chronologically, we trained the model on data from 2008, when the Democratic party won, and 2016, when the Republican party won, to ensure the model was exposed to instances of both major parties securing victory. This approach aimed to reduce potential bias and help the model generalize better across different political outcomes. We validated it on 2012, and using 2020 as our final test. We beleived this split would better replicate how machine learning is actually deployed: using the past to anticipate the future.
+## Overview
 
-The model was implemented in PyTorch, where we focused on proper scaling and class balancing to prevent the network from simply memorizing dominant voting patterns. During training and evaluation, we used confusion matrices to visualize prediction performance and generated detailed classification reports to assess precision and recall across each class.
+This project explores the intersection of machine learning and political science by analyzing whether demographic and economic factors alone are enough to predict election outcomes in the United States. Specifically, we built and trained four different classification models to predict whether a U.S. county would vote Democratic or Republican during presidential elections from 2008 to 2020.
 
-One of our key visual outputs was the confusion matrix from the 2020 test results. It made the strengths and weaknesses of the model immediately clear: Democratic strongholds, especially dense urban counties, were correctly classified with high confidence. Similarly, many rural counties with older populations and lower education levels, which historically lean Republican, were predicted accurately.
+Our goal wasn’t just to create an accurate predictor, but to possibly find some common patterns in America’s voting behavior, understand model performance across different architectures, and visualize what these models can tell us about the electorate.
 
-The most revealing plots were the ones that highlighted the gray areas, or the misclassifications. Suburban counties, places in demographic flux, and historically unpredictable regions were far more difficult for the model to handle. It was in these mistakes that we found some truths where politics isn’t static, and voters don’t always behave in ways that are easily captured by a formula.
 
-What we learned through this process is that neural networks are powerful tools for pattern recognition, but their predictions are bound to the data we feed them. They can mirror past trends but are not built to anticipate social change or political upsets unless we account for those possibilities in the model structure or features.
+## Purpose
 
-This project reinforced how essential preprocessing and validation designs are to become meaningful outcomes. But more than that, it reminded us that data science isn’t just about predictions but it’s about questions and what we ask. Even with the mistakes our models can make, they become opportunities to better understand what we might want to know.
+In many political forecasting tools, polling and sentiment analysis dominate the landscape. But what if those tools weren’t available? Could we use static features like education, income, and age distribution to predict how a region would vote?
+
+This project is our attempt to answer that question, using machine learning that include these features.
+
+
+## Models Trained
+
+We trained and compared the following four models:
+
+1. **Logistic Regression**
+   - A straightforward baseline model used for binary classification.
+   - Provided interpretable coefficients but limited in handling complex, nonlinear patterns.
+
+2. **Multilayer Perceptron (MLP)**
+   - A classic fully connected neural network built using PyTorch.
+   - Included multiple hidden layers with ReLU activation and dropout regularization.
+
+3. **PyTorch Neural Network (Custom MLP)**
+   - Custom designed with flexibility in architecture and training control.
+   - Enabled precise tuning and checkpoint saving for best model performance.
+
+4. **TensorFlow Dense Neural Network**
+   - Implemented with Keras for accessibility and comparison.
+   - Similar architecture to the PyTorch model, used to validate consistency across frameworks.
+
+Each of these models followed a train, validation, and test set. To ensure balanced training and reduce partisan bias, we chose to train our models using data from the 2008 and 2016 presidential elections, years in which each major political party won once. We beleived this allowed the model to learn from a more diverse set of electoral outcomes and avoid overfitting to a single party's victory pattern.
+
+Originally, the training set included 2008 and 2012, both of which were Democratic victories. We recognized that this introduced a potential bias, encouraging the model to favor Democratic outcomes by default. By incorporating 2016, a Republican win, we introduced necessary variation to help the model generalize more effectively to future elections.
+
+We then decided to use the year 2012 as our validation set to evaluate the models performance, as well as any fine-tuning to the model and its hyperparameters. 
+
+This then led us to use the 2020 election year data on our test, which we seem to get very good results.
+
+## Best Performing Model
+
+The PyTorch MLP model emerged as the most effective, demonstrating the best generalization performance. Its architecture allowed it to model non linear relationships in the data more effectively than logistic regression, and it offered more control and flexibility than the TensorFlow implementation.
+
+It consistently achieved:
+- Over 80% accuracy
+- Balanced precision and recall across both classes (Democratic and Republican)
+- Strong performance even in closely contested counties
+
+
+## Visualizations and Interpretation
+
+Several plots were generated during training and evaluation like the ones listed below:
+
+- **Confusion Matrix**: Illustrated how well each model performed across true/false positives and negatives. The PyTorch model had the most balanced performance.
+- **Training & Validation Curves**: Showed stable learning without signs of overfitting, validating our use of dropout layers and batch normalization.
+- **Feature Influence**: This is something that is not explicitly visualized but could see strong correlations between some features:
+  - Higher education & urbanization == Democrat
+  - Older, rural, less-educated populations == Republican
+
+
+## Dataset
+
+We worked with a dataset containing conditional probabilities (`P(democrat|C)`, `P(republican|C)`, `P(other|C)`) for each U.S. county, alongside over 100 features including:
+- Age and Gender Distribution
+- Racial Demographics
+- Income Brackets
+- Educational Attainment
+- Urban vs. Rural Classifications
+
+Each entry corresponded to one county in one of the election years: 2008, 2012, 2016, or 2020.
+
+
+## How to Run
+
+1. Open the notebook:
+
+```bash
+cd Notebooks
+jupyter notebook Election_script.ipynb
+```
+
+2. Ensure the required data files are available:
+
+- `dataset.csv` and `probabilities.csv` should be located in the `data/` directory.
+
+3. The notebook will walk you through:
+
+- Data preprocessing  
+- Training and evaluating four different models  
+- Generating performance visualizations  
+- Drawing final conclusions based on model results
+
+All code resides in the `Notebooks/` folder, and data inputs are organized in the `data/` directory.
+
+## Conclusion
+
+This project confirmed that a county's demographics tell a surprisingly accurate story about its voting behavior. We found that machine learning, without polling or public opinion, can identify repeatable patterns that reflect real political divides.
+
+The neural network's performance proves that when trained well, static features can yield powerful insights into societal behavior.
